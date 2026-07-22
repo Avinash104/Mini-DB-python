@@ -7,6 +7,10 @@ RowData = Union[Dict[str, Any], List[Any]]
 class Table:
     def __init__(self, name:str, columns: list[Column]):
         self.name = name
+        self.columns = columns
+        self.rows: List[Row] = []
+        self.column_map = {col.column_name: col for col in columns}
+
         if not isinstance(columns, list):
             raise TypeError("columns must be a list of Column objects")
 
@@ -15,8 +19,6 @@ class Table:
                 raise TypeError(
                     f"Expected Column object, got {type(col).__name__}"
                 )
-        self.columns = columns
-        self.rows: List[Row] = []
 
     # Insert a new row into the table
     def insert_row(self, row : RowData):
@@ -30,21 +32,21 @@ class Table:
             
             # Map list values to column names by position
             for i,col in enumerate(self.columns):
-                data_dict[col.name] = row[i]
+                data_dict[col.column_name] = row[i]
         
         elif isinstance(row, dict):
             data_dict = row
 
             # Check if any reuired column is missing, if so check if a default value can be substituted.
             for col in self.columns:
-                if col.is_Required and col.name not in data_dict:
+                if col.is_Required and col.column_name not in data_dict:
                     if col.default_value:
-                        data_dict[col.name] = col.default_value
+                        data_dict[col.column_name] = col.default_value
                     else:
-                        raise ValueError(f"Missing required column: '{col.name}'.")
+                        raise ValueError(f"Missing required column: '{col.column_name}'.")
             
             # Check for unknown columns
-            extra_keys = set(data_dict.keys()) - {col.name for col in self.columns}
+            extra_keys = set(data_dict.keys()) - {col.column_name for col in self.columns}
             if extra_keys:
                 raise ValueError(f"Unknown columns in row: {extra_keys}")
         
@@ -59,7 +61,7 @@ class Table:
 
     def validate_row(self, data_dict:Dict):
         for col in self.columns:
-            value = data_dict.get(col.name)
+            value = data_dict.get(col.column_name)
 
             # Skip validation if value is None and column is not required
             if value is None and not col.is_Required:

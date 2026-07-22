@@ -2,14 +2,22 @@ from database import Database, Column
 
 db = Database()
 
+# db.create_table(
+#     "employees",
+#     [
+#         Column("id", int),
+#         Column("name", str),
+#         Column("salary", float)
+#     ]
+# )
 db.create_table(
-    "employees",
-    [
-        Column("id", int),
-        Column("name", str),
-        Column("salary", float)
+    table_name= "employees",
+    columns=[
+        {"name": "id", "data_type": int},
+        {"name": "name", "data_type": str},
+        {"name": "salary", "data_type": float}
     ]
-)
+)   
 
 db.insert_table_row(
     "employees",

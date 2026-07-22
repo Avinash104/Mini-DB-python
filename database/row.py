@@ -22,3 +22,6 @@ class Row:
     def __iter__(self) -> Iterable[Tuple[str, Any]]:
         return iter(self.data.items())
     
+    def __contains__(self, key:str):
+        return key in self.data
+    
