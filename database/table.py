@@ -42,8 +42,8 @@ class Table:
 
             # Check if any reuired column is missing, if so check if a default value can be substituted.
             for col in self.columns:
-                if col.is_Required and col.column_name not in data_dict:
-                    if col.default_value:
+                if col.required and col.column_name not in data_dict:
+                    if col.default_value is not None:
                         data_dict[col.column_name] = col.default_value
                     else:
                         raise ValueError(f"Missing required column: '{col.column_name}'.")
@@ -68,7 +68,7 @@ class Table:
             value = data_dict.get(col.column_name)
 
             # Skip validation if value is None and column is not required
-            if value is None and not col.is_Required:
+            if value is None and not col.required:
                 continue
 
             # Use column's validate method

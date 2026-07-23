@@ -73,8 +73,8 @@ class Database:
         return target_table.get_rows()
 
     """Select rows from a table based on conditions."""
-    def select(self, table_name: str):
+    def select(self, table_name: str, column_list: list[str] | None = None):
         if table_name not in self.tables:
             raise TableDoesNotExistError(table_name)
 
-        return Query(table_name, self)        
+        return Query(self,table_name,column_list)        

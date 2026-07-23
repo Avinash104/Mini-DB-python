@@ -37,4 +37,7 @@ db.insert_table_row(
 )
 
 print(db.get_table_rows("employees"))
-print(db.select("employees").where("salary", "<", 52000.00).execute())
+print(db.select(table_name="employees").
+        where("salary", "<", 52000.00).execute())
+print(db.select(table_name="employees", column_list=["name", "salary"]).
+        where("salary", "<", 52000.00).execute())
