@@ -4,9 +4,12 @@ from .row import Row
 
 RowData = Union[Dict[str, Any], List[Any]]
 
+"""Table class for managing columns and rows."""
 class Table:
-    def __init__(self, name:str, columns: list[Column]):
-        self.name = name
+
+    """Initialize the Table with a name, columns, and an empty list of rows."""
+    def __init__(self, table_name:str, columns: list[Column]):
+        self.table_name = table_name
         self.columns = columns
         self.rows: List[Row] = []
         self.column_map = {col.column_name: col for col in columns}
@@ -20,7 +23,7 @@ class Table:
                     f"Expected Column object, got {type(col).__name__}"
                 )
 
-    # Insert a new row into the table
+    """Insert a row into the table after validating it against the column definitions."""
     def insert_row(self, row : RowData):
         # 1. Normalize input: Convert the list into dict of rows
         data_dict: Dict[str,Any] ={}
@@ -59,6 +62,7 @@ class Table:
         # 3. Append row to rows of the table
         self.rows.append(Row(data_dict))
 
+    """Validate the row data against the column definitions."""
     def validate_row(self, data_dict:Dict):
         for col in self.columns:
             value = data_dict.get(col.column_name)
@@ -70,14 +74,21 @@ class Table:
             # Use column's validate method
             col.validate_value(value)
 
+    """Get a string representation of the table, including its name, columns, and rows."""
     def __repr__(self):
-        return f"Table(name={self.name}, columns={self.columns}, rows={self.rows})"
-    
+        return f"Table(name={self.table_name}, columns={self.columns}, rows={self.rows})"
+
+    """Get all rows from the table."""
     def get_rows(self):
         return self.rows
-    
+
+    """Get a string representation of the table, including its name and rows."""
     def __str__(self):
-        output = f"Table: {self.name}\n"
+        output = f"Table: {self.table_name}\n"
         for row in self.rows:
             output += f"  {row}\n"
         return output
+
+    """Get a column by name from the table."""
+    def get_column(self, column_name: str):
+        return self.column_map.get(column_name)

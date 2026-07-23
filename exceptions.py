@@ -1,13 +1,14 @@
-# Base exception for your entire library
+"""Base exception for your entire library"""
 class MiniDBError(Exception):
     """Base exception for all MiniDB errors."""
     pass
 
-# Domain-specific base errors
+"""Base for database-level errors."""
 class DatabaseError(MiniDBError):
     """Base for database-level errors."""
     pass
 
+"""Base for table-related errors."""
 class TableError(DatabaseError):
     """Base for table-related errors."""
     pass
@@ -56,7 +57,7 @@ class TableCreationColumnError(TableError):
 
         super().__init__(message)
 
-# Column errors
+"""Base for column-related errors."""
 class ColumnError(DatabaseError):
     """Base for column-related errors."""
     pass
@@ -64,10 +65,43 @@ class ColumnError(DatabaseError):
 class InvalidColumnTypeError(ColumnError):
     pass
 
-class UnknownColumnError(ColumnError):
-    pass
+class ColumnTypeMismatchError(ColumnError):
+    def __init__(self, column_name: str, expected_type: type, received_type: type):
+        self.column_name = column_name
+        self.expected_type = expected_type
+        self.received_type = received_type
 
-# Row errors
+        message = f"Column '{column_name}' expects type '{expected_type.__name__}', but received type '{received_type.__name__}'."
+
+        super().__init__(message)
+
+class ColumnValueError(ColumnError):
+    def __init__(self, column_name: str, message: str):
+        self.column_name = column_name
+        self.message = message
+
+        full_message = f"Column '{column_name}': {message}"
+
+        super().__init__(full_message)
+
+class ColumnNotNullableError(ColumnError):
+    def __init__(self, column_name: str):
+        self.column_name = column_name
+
+        message = f"Column '{column_name}' cannot be null."
+
+        super().__init__(message)
+
+class UnknownColumnError(ColumnError):
+    def __init__(self, column_name: str, table_name: str):
+        self.column_name = column_name
+        self.table_name = table_name
+
+        message = f"Column '{column_name}' does not exist in table '{table_name}'."
+
+        super().__init__(message)
+
+"""Base for row-related errors."""
 class RowError(DatabaseError):
     """Base for row-related errors."""
     pass
@@ -77,3 +111,18 @@ class RowValidationError(RowError):
 
 class DuplicatePrimaryKeyError(RowError):
     pass   
+
+"""Base for query-related errors."""
+class QueryError(DatabaseError):
+    pass
+
+class QueryInvalidOperatorError(QueryError):
+    """Raised when invalid operator is provided in the where clause of the query."""
+    def __init__(self, operator) -> None:
+        self.operator = operator
+
+        message = f"Invalid operator '{operator}' received in the query."
+        
+        super().__init__(message)
+
+        

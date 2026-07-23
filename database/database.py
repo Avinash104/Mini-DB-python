@@ -1,16 +1,22 @@
 from .table import Table
 from .column import Column
+from .query import Query
 from exceptions import (TableAlreadyExistsError, 
                         TableNotFoundError, 
                         TableNameError, 
                         TableDoesNotExistError, 
                         TableCreationColumnError)
 
+"""
+Database class for managing tables and rows.
+"""
 class Database:
 
+    """Initialize the Database with an empty dictionary of tables."""
     def __init__(self):
         self.tables = {}
 
+    """Create a new table in the database."""
     def create_table(self, table_name: str, columns: list):
         if table_name in self.tables:
             raise TableAlreadyExistsError(table_name)
@@ -37,7 +43,13 @@ class Database:
 
         self.tables[table_name] = Table(table_name, columns=processed_columns)
 
-        
+    """Get a table by name."""
+    def get_table(self, table_name: str):
+        if table_name not in self.tables:
+            raise TableNotFoundError(table_name)
+        return self.tables[table_name]
+
+    """Insert a row into a table."""
     def insert_table_row(self, table_name: str, row: dict | list):
 
         if not isinstance(table_name,str):
@@ -49,6 +61,7 @@ class Database:
         target_table: Table = self.tables[table_name]
         target_table.insert_row(row)
 
+    """Get all rows from a table."""
     def get_table_rows(self,  table_name: str):
         if not isinstance(table_name,str):
             raise TableNameError(table_name)
@@ -58,4 +71,10 @@ class Database:
         
         target_table: Table = self.tables[table_name]
         return target_table.get_rows()
-        
+
+    """Select rows from a table based on conditions."""
+    def select(self, table_name: str):
+        if table_name not in self.tables:
+            raise TableDoesNotExistError(table_name)
+
+        return Query(table_name, self)        
