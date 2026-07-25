@@ -16,6 +16,8 @@ class Query:
         self.column_list = column_list
         self.conditions = []
         self.results=[]
+        self.group_column = None
+        self.grouped_rows = {}
         self.operators_map = {
             '==': operator.eq,
             '!=': operator.ne,
@@ -98,10 +100,78 @@ class Query:
         return self
 
     def limit(self, limit: int):
+        
         self.results = self.results[:limit]
         return self
 
-                    
+    def set_cols(self, col_val: dict):
+
+        for row in self.results:
+            for col, val in col_val.items():
+                row[col] = val 
+
+        return self
+
+    # Aggregate funtions SUM, AVG, MAX, MIN, COUNT
+    def count(self):
+
+        count = 0;
+        for _ in self.results:
+            count+=1
+
+        return count
+
+    def sum(self, column: str):
+
+        sum_val = 0
+        for row in self.results:
+            sum_val += row[column]
+
+        return sum_val
+
+    def avg(self, column:str):
+
+        count=0
+        sum_val=0
+        for row in self.results:
+            count+=1
+            sum_val += row[column]
+
+        if count == 0:
+            return 0
+
+        return sum_val / count
+
+    def max(self, column: str):
+
+        if not self.results:
+            return None
+        
+        max_val = self.results[0][column]
+
+        for row in self.results:
+            if row[column] > max_val:
+                max_val = row[column]
+
+        return max_val
+    
+    def min(self, column: str):
+
+        if not self.results:
+            return None
+        
+        min_val = self.results[0][column]
+
+        for row in self.results:
+            if row[column] < min_val:
+                min_val = row[column]
+
+        return min_val
+
+    def group_by(self, column: str):
+
+        self.group_column = column
+        return self
              
 
 
