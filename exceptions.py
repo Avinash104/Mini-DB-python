@@ -125,4 +125,13 @@ class QueryInvalidOperatorError(QueryError):
         
         super().__init__(message)
 
+class QueryInvalidAggregationError(QueryError):
+    """Raised when invalid aggregation type is provided in the query."""
+    def __init__(self, aggregation_type) -> None:
+        self.aggregation_type = aggregation_type
+
+        message = f"Invalid aggregation type '{aggregation_type}' received in the query."
+        
+        super().__init__(message)
+
         
