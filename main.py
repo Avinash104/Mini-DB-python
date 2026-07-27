@@ -34,22 +34,45 @@ load_sample_data(db)
 
 # print(db.select(table_name="employees", column_list=["city"]).group_by("city").avg("salary"))
 
-# """UPDATE"""
+"""UPDATE"""
 # print(db.update(table_name="employees").
 #         where("emp_id", "==", 1).
 #         set({"name": "Kira"}).
 #         execute())
 
+"""DELETE"""
+# print(db.select(table_name="employees").where("emp_id", "==", 1).execute())
+# print(db.delete_from(table_name="employees").
+#         where("emp_id", "==", 1).
+#         execute())
 # print(db.select(table_name="employees").where("emp_id", "==", 1).execute())
 # print(db.get_table_rows("employees"))
 
+# print(db.get_table_rows("employees"))
+
 # Testing Group_by
-print(db.select(table_name="employees").
-      group_by("city").
-      count().
-      order_by("city").
-      execute())
+# print(db.select(table_name="employees").
+#       # where("age", "<", 28).
+#       group_by("department_id").
+#       avg("salary").
+#       order_by("department_id").
+#       execute())
 
 # print(db.select(table_name="employees").
 #       group_by("department_id").
 #       order_by("department_id").execute())
+
+print(db.select("employees")
+  .join(
+      "departments",
+      left_key="employees.department_id",
+      right_key="departments.department_id"
+  ) 
+  .join(
+      "projects",
+      left_key="employees.project_id",
+      right_key="projects.project_id"
+  )
+  .where("employees.salary", ">", 90000.00) 
+  .order_by("employees.salary") 
+  .execute())

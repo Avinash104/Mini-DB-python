@@ -1,6 +1,6 @@
 from .table import Table
 from .column import Column
-from .query import Query
+from .querybuilder import QueryBuilder
 from exceptions import (TableAlreadyExistsError, 
                         TableNotFoundError, 
                         TableNameError, 
@@ -77,11 +77,19 @@ class Database:
         if table_name not in self.tables:
             raise TableDoesNotExistError(table_name)
 
-        return Query(self,table_name,column_list)       
+        return QueryBuilder(self,table_name,column_list)       
      
     """Select rows from a table based on conditions."""
     def update(self, table_name: str):
         if table_name not in self.tables:
             raise TableDoesNotExistError(table_name)
 
-        return Query(self,table_name)        
+        return QueryBuilder(self,table_name)        
+     
+    """Select rows from a table based on conditions."""
+    def delete_from(self, table_name: str):
+        print("delete from called")
+        if table_name not in self.tables:
+            raise TableDoesNotExistError(table_name)
+
+        return QueryBuilder(self,table_name, query_type="DELETE")        

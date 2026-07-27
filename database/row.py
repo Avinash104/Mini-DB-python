@@ -35,3 +35,16 @@ class Row:
     def __contains__(self, key:str):
         return key in self._data
     
+    def items(self):
+        return self._data.items()
+
+    def keys(self):
+        return self._data.keys()
+
+    def values(self):
+        return self._data.values()
+
+    def get(self, key: str):
+        return self._data[key]
+
+    

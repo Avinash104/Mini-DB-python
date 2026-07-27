@@ -62,6 +62,12 @@ class Table:
         # 3. Append row to rows of the table
         self.rows.append(Row(data_dict))
 
+    def delete_rows(self, rows_to_delete: list[RowData]):
+        print("deleteting rows")
+        self.rows = [row 
+                     for row in self.rows 
+                     if row not in rows_to_delete]
+
     """Validate the row data against the column definitions."""
     def validate_row(self, data_dict:Dict):
         for col in self.columns:
