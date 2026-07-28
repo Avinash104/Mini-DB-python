@@ -6,6 +6,7 @@ db = Database()
 """Load the sample data to initialize the mini-DB."""
 load_sample_data(db)
 
+"""where testing"""
 # print(db.get_table_rows("employees"))
 # print(db.select(table_name="employees", column_list=["emp_id", "name", "salary", "age"]).
 #         where("emp_id", "<", 20).
@@ -50,7 +51,7 @@ load_sample_data(db)
 
 # print(db.get_table_rows("employees"))
 
-# Testing Group_by
+"""Testing Group_by"""
 # print(db.select(table_name="employees").
 #       # where("age", "<", 28).
 #       group_by("department_id").
@@ -62,7 +63,10 @@ load_sample_data(db)
 #       group_by("department_id").
 #       order_by("department_id").execute())
 
-print(db.select("employees")
+"""Join testing"""
+print(db.select("employees", column_list=["employees.emp_id", "employees.name", 
+                                          "employees.salary","departments.department_name", 
+                                          "projects.project_name"])
   .join(
       "departments",
       left_key="employees.department_id",

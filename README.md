@@ -38,3 +38,6 @@ db.insert_table_row(
 
 print(db.get_table_rows("employees"))
 ```
+
+Below command is used to run the tests for the database module:
+```python -m pytest tests/test_database.py```

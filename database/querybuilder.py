@@ -63,14 +63,13 @@ class QueryBuilder:
     """Add a condition to the query based on a column, operator, and value."""
     def where(self, column: str, operator: str, value: Any) -> 'QueryBuilder':
 
-        print("Inside where method")
+        # print("Inside where method")
 
         if operator not in self.operators_map:
             raise QueryInvalidOperatorError(operator)
-        
-        # if not self.table.get_column(column):
-        #     raise UnknownColumnError(column, self.table.table_name)
 
+        self._validate_column_reference(column)
+        
         self.conditions.append((column, operator, value))
 
         return self
@@ -78,8 +77,7 @@ class QueryBuilder:
     """Update the order by column(order_column) and the type of order i.e. ascending or descending(order_desc)."""
     def order_by(self, column: str, reversed: bool | None = None):
 
-        # if not self.table.get_column(column):
-        #     raise UnknownColumnError(column, self.table.table_name)
+        self._validate_column_reference(column)
 
         self.order_column = column
 
@@ -95,13 +93,13 @@ class QueryBuilder:
 
     """Set the group_column property."""
     def group_by(self, column: str):
-        print("---group by---")
+        # print("---group by---")
         self.group_column = column
         return self
 
     def join(self, table: str, left_key: str, right_key: str, join_type: str = "INNER"):
 
-        print("inside join")
+        # print("inside join")
 
         join_entry ={
             "table": table,
@@ -116,7 +114,7 @@ class QueryBuilder:
 
     """Execute the query and return the results that match the conditions."""
     def execute(self):
-        print("---execute method---")
+        # print("---execute method---")
 
         if self.query_type == "UPDATE":
             self._execute_update()
@@ -127,7 +125,7 @@ class QueryBuilder:
             return
 
         if len(self.joins) > 0:
-            print("join details: ", self.joins)
+            # print("join details: ", self.joins)
             rows = self._apply_joins()
         else:
             rows = self.table.get_rows()
@@ -139,7 +137,7 @@ class QueryBuilder:
         groups = {}
 
         if self.group_column is not None:
-            print("inside group by apply")
+            # print("inside group by apply")
             groups : dict = self._apply_group_by(rows)
 
         if self.aggregation_type is not None:
@@ -193,8 +191,8 @@ class QueryBuilder:
 
         for join in self.joins:
             # Got the right join table rows prefixed as well
-            print("Join details inside _apply_join", join)
-            right_table_rows = self.database.get_table_rows(join["table"])
+            # print("Join details inside _apply_join", join)
+            right_table_rows = self.database.get_table(join["table"]).get_rows()
             prefixed_right_rows = [
                 self._prefix_row(row, join["table"])
                 for row in right_table_rows
@@ -225,8 +223,19 @@ class QueryBuilder:
 
         return {f"{table_name}.{key}": value for key, value in row.items()}
 
+    """This helper methods check if the column name is qualified or not then checks its validity"""
+    def _validate_column_reference(self, column: str):
 
+        if "." not in column:
+            table = self.table
+            column_name = column
+        else:
 
+            table_name, column_name = column.split(".", 1)
+            table = self.database.get_table(table_name)
+
+        if not table.get_column(column_name):
+            raise UnknownColumnError(column, self.table.table_name)
 
     def _apply_where(self, rows):
 
@@ -238,7 +247,7 @@ class QueryBuilder:
         return filtered_rows
 
     def _apply_group_by(self,rows):
-        print("---group by---")
+        # print("---group by---")
         groups: dict = {}
         if len(rows) == 0:
             rows = self.table.get_rows()
@@ -309,7 +318,7 @@ class QueryBuilder:
 
     def _apply_delete(self, rows):
 
-        print("Applying delete on ", rows)
+        # print("Applying delete on ", rows)
         self.table.delete_rows(rows)
         return 
 
@@ -344,14 +353,14 @@ class QueryBuilder:
             return result
 
     def sum(self, sum_column:str):
-        print("---sum method---")
+        # print("---sum method---")
         self.aggregation_type = AggregationType.SUM
         self.aggregation_column = sum_column
-        print("agg method: ", self.aggregation_type)
+        # print("agg method: ", self.aggregation_type)
         return self
 
     def _apply_sum(self, rows: list | None = None, groups: dict |None = None):
-        print("---apply sum---")
+        # print("---apply sum---")
         if self.group_column is None:
             sum_val = 0
             if rows is None:
@@ -362,7 +371,7 @@ class QueryBuilder:
 
             return sum_val
         else:
-            print("---group apply sum---")
+            # print("---group apply sum---")
 
             result=[]
 

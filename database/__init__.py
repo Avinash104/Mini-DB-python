@@ -1,6 +1,7 @@
 from .database import Database
 from .table import Table
 from .column import Column
+from .row import Row
 
 # minidb/__init__.py
 from exceptions import (
