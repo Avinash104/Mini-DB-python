@@ -1,7 +1,7 @@
 from .column import Column
 from typing import Union, Dict, List, Any 
 from .row import Row
-from exceptions import RequiredColumnMissing, UnkownColumnInsert, MissingColumnsInRowInsert
+from exceptions import RequiredColumnMissing, UnkownColumnInsert, MissingColumnsInRowInsert, DuplicatePrimaryKeyError
 
 RowData = Union[Dict[str, Any], List[Any]]
 
@@ -15,6 +15,15 @@ class Table:
         self.rows: List[Row] = []
         self.column_map = {col.column_name: col for col in columns}
         self.required_columns = [col.column_name for col in columns if col.required or col.primary_key]
+
+        self.primary_key_index = {}
+
+        primary_keys = [col.column_name for col in columns if col.primary_key]
+
+        if len(primary_keys) > 1:
+            raise ValueError("Composite primary keys are not supported.")
+
+        self.primary_key = primary_keys[0] if primary_keys else None
 
         if not isinstance(columns, list):
             raise TypeError("columns must be a list of Column objects")
@@ -62,6 +71,8 @@ class Table:
 
         self._required_columns_check(data_dict)
 
+        self._primary_key_check(data_dict)
+
         # Check for unknown columns
         extra_keys = set(data_dict.keys()) - {col.column_name for col in self.columns}
         if extra_keys:
@@ -77,9 +88,6 @@ class Table:
                 else:
                     raise RequiredColumnMissing(col.column_name)
 
-            if col.primary_key:
-                self._primary_key_check()
-
             value = data_dict.get(col.column_name)
 
             # Skip validation if value is None and column is not required
@@ -89,12 +97,17 @@ class Table:
             # Use column's validate method
             col.validate_value(value)
 
-    def _primary_key_check(self):
-        pass
+    def _primary_key_check(self, data_dict):
+        pk = data_dict[self.primary_key]
+
+        if pk in self.primary_key_index:
+            raise DuplicatePrimaryKeyError(pk, self.table_name)
+
+        self.primary_key_index[pk] = data_dict
 
     """Get a string representation of the table, including its name, columns, and rows."""
     def __repr__(self):
-        return f"Table(name={self.table_name}, columns={self.columns}, rows={self.rows})"
+        return f"Table(name={self.table_name}, columns={self.columns}, rows={self.rows[:10]})"
 
     """Get all rows from the table."""
     def get_rows(self):

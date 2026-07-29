@@ -57,6 +57,16 @@ class TableCreationColumnError(TableError):
 
         super().__init__(message)
 
+class DuplicatePrimaryKeyError(TableError):
+    """Raised when duplicate primary key is provided during row insertion."""
+    def __init__(self, pk, table_name):
+        self.pk = pk
+        self.table_name = table_name
+        
+        message = f"Duplicate primary key was provided for column '{pk}' in table '{table_name}'."
+
+        super().__init__(message)
+
 """Base for column-related errors."""
 class ColumnError(DatabaseError):
     """Base for column-related errors."""
@@ -124,9 +134,6 @@ class RowError(DatabaseError):
 
 class RowValidationError(RowError):
     pass
-
-class DuplicatePrimaryKeyError(RowError):
-    pass   
 
 class MissingColumnsInRowInsert(RowError):
     def __init__(self):

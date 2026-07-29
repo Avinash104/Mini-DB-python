@@ -1,7 +1,7 @@
 import pytest
 from database import Column
 from database import Row
-from exceptions import TableAlreadyExistsError, RequiredColumnMissing, NoQualifiedRowsForDelete, UpdateColumnTypeMismatch, RequiredColumnCannotBeNone, TableDoesNotExistError, TableNotFoundError, UnknownColumnError, InvalidDataTypeInWhereClause
+from exceptions import TableAlreadyExistsError, DuplicatePrimaryKeyError, RequiredColumnMissing, NoQualifiedRowsForDelete, UpdateColumnTypeMismatch, RequiredColumnCannotBeNone, TableDoesNotExistError, TableNotFoundError, UnknownColumnError, InvalidDataTypeInWhereClause
 
 def test_database_connection(test_db):
 
@@ -77,10 +77,10 @@ def test_default_value_insertion(test_db):
     assert result[0]["department_id"] == 0  # Default value for department_id
     assert result[0]["project_id"] == 0     # Default value for project_id
 
-# def test_insert_duplicate_primary_key(test_db):
-#     duplicate_row = {"emp_id": 1, "name": "Duplicate Primary Key", "salary": 110000.00, "age": 34}
-#     with pytest.raises(ValueError):
-#         test_db.insert_into("employees", duplicate_row)
+def test_insert_duplicate_primary_key(test_db):
+    duplicate_row = {"emp_id": 1, "name": "Duplicate Primary Key", "salary": 110000.00, "age": 34}
+    with pytest.raises(DuplicatePrimaryKeyError):
+        test_db.insert_table_row("employees", duplicate_row)
 
 def test_update_existing_row(test_db):
     test_db.update("employees").set_cols({"age":32, "salary": 95000.00}).where("emp_id", "==", 1).execute()
