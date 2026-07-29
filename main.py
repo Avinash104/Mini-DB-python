@@ -1,11 +1,16 @@
 from database import Database, Column
-from datasets import load_sample_data
+from datasets import load_sample_data, load_test_data
 
 db = Database()
 
 """Load the sample data to initialize the mini-DB."""
-load_sample_data(db)
+# load_sample_data(db)
+load_test_data(db)
+print(db.select("employees").where("emp_id", "==", 1).execute())
+db.update("employees").set_cols({"age":32, "salary": 95000.00}).where("emp_id", "==", 1).execute()
+print(db.select("employees").where("emp_id", "==", 1).execute())
 
+    
 """where testing"""
 # print(db.get_table_rows("employees"))
 # print(db.select(table_name="employees", column_list=["emp_id", "name", "salary", "age"]).

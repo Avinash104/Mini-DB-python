@@ -1,7 +1,13 @@
 # from .database import Database
 from typing import Any
 import operator
-from exceptions import QueryInvalidOperatorError, UnknownColumnError, QueryInvalidAggregationError
+from exceptions import (QueryInvalidOperatorError, 
+                        NoQualifiedRowsForDelete, 
+                        RequiredColumnCannotBeNone, 
+                        UpdateColumnTypeMismatch,
+                        UnknownColumnError, 
+                        QueryInvalidAggregationError, 
+                        InvalidDataTypeInWhereClause)
 from enum import Enum
 
 class AggregationType(Enum):
@@ -280,8 +286,11 @@ class QueryBuilder:
             if op_func is None:
                 raise QueryInvalidOperatorError(op)
 
-            if not op_func(row_val, val):
-                return False
+            if isinstance(val, type(row_val)):
+                if not op_func(row_val, val):
+                    return False
+            else:
+                raise InvalidDataTypeInWhereClause(type(row_val), type(val))
 
         return True
 
@@ -301,7 +310,7 @@ class QueryBuilder:
 
         return projected_results
         
-    def set(self, col_val: dict):
+    def set_cols(self, col_val: dict):
 
         self.query_type = "UPDATE"
         self.update_col_dict = col_val
@@ -312,13 +321,25 @@ class QueryBuilder:
 
         for row in rows:
             for col, val in self.update_col_dict.items():
-                row[col] = val 
+                    if col not in row: 
+                        raise UnknownColumnError(col, self.table.table_name)
+
+                    if val is None and col in self.table.required_columns:
+                        raise RequiredColumnCannotBeNone(col)
+                    
+                    if not isinstance(val, type(row[col])):
+                        raise UpdateColumnTypeMismatch(type(row[col]), type(val))
+                    
+                    row[col] = val
 
         return 
 
     def _apply_delete(self, rows):
 
         # print("Applying delete on ", rows)
+        if len(rows) == 0:
+            raise NoQualifiedRowsForDelete()
+
         self.table.delete_rows(rows)
         return 
 

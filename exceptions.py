@@ -101,6 +101,22 @@ class UnknownColumnError(ColumnError):
 
         super().__init__(message)
 
+class RequiredColumnMissing(ColumnError):
+    def __init__(self, column_name: str):
+        self.column_name = column_name
+
+        message = f"Required column '{column_name}' is missing."
+
+        super().__init__(message)
+
+class UnkownColumnInsert(ColumnError):
+    def __init__(self, unkown_column_list: set):
+        self.unkown_column_list = unkown_column_list
+
+        message = f"Unkown columns '{unkown_column_list}' provided in insert operation column."
+
+        super().__init__(message)
+
 """Base for row-related errors."""
 class RowError(DatabaseError):
     """Base for row-related errors."""
@@ -111,6 +127,12 @@ class RowValidationError(RowError):
 
 class DuplicatePrimaryKeyError(RowError):
     pass   
+
+class MissingColumnsInRowInsert(RowError):
+    def __init__(self):
+        message = "All columms must be provided in list input for row insert. Use dictionary if you want to insert selectively."
+
+        super().__init__(message)
 
 """Base for query-related errors."""
 class QueryError(DatabaseError):
@@ -133,5 +155,45 @@ class QueryInvalidAggregationError(QueryError):
         message = f"Invalid aggregation type '{aggregation_type}' received in the query."
         
         super().__init__(message)
+
+class InvalidDataTypeInWhereClause(QueryError):
+    """Raised when invalid aggregation type is provided in the query."""
+    def __init__(self, expected_data_type, received_data_type) -> None:
+        self.expected_data_type = expected_data_type
+        self.received_data_type = received_data_type
+
+        message = f"Invalid data type received in where clause. Expected '{expected_data_type}', received '{received_data_type}' in the query."
+        
+        super().__init__(message)
+
+class RequiredColumnCannotBeNone(QueryError):
+    """Raised when invalid aggregation type is provided in the query."""
+    def __init__(self, column_name) -> None:
+        self.column_name = column_name
+
+        message = f"Required column '{column_name}' connot be set to none in update query."
+        
+        super().__init__(message)
+
+class UpdateColumnTypeMismatch(QueryError):
+    """Raised when invalid column type is provided in the update query."""
+    def __init__(self, expected_data_type, received_data_type) -> None:
+        self.expected_data_type = expected_data_type
+        self.received_data_type = received_data_type
+
+        message = f"Invalid data type received in update clause. Expected '{expected_data_type}', received '{received_data_type}' in the query."
+        
+        super().__init__(message)
+
+class NoQualifiedRowsForDelete(QueryError):
+    """No qualified rows found for delete query."""
+    def __init__(self) -> None:
+
+        message = "No qualified rows found for delete query."
+        
+        super().__init__(message)
+
+
+        
 
         

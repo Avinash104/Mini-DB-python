@@ -9,15 +9,15 @@ class Column:
     def __init__(self, column_name:str, 
                  data_type:type, 
                  nullable:bool=True, 
-                 required:bool=True,
+                 required:bool=False,
                  default_value:Any=None, 
                  primary_key:bool=False):
         self.column_name = column_name
         self.data_type = data_type
         self.nullable = nullable
-        self.required = required
         self.default_value = default_value
         self.primary_key = primary_key
+        self.required = required if not self.primary_key else True
 
     """Get a string representation of the column, including its name and data type."""
     def __repr__(self):

@@ -1,6 +1,7 @@
 from .column import Column
 from typing import Union, Dict, List, Any 
 from .row import Row
+from exceptions import RequiredColumnMissing, UnkownColumnInsert, MissingColumnsInRowInsert
 
 RowData = Union[Dict[str, Any], List[Any]]
 
@@ -13,6 +14,7 @@ class Table:
         self.columns = columns
         self.rows: List[Row] = []
         self.column_map = {col.column_name: col for col in columns}
+        self.required_columns = [col.column_name for col in columns if col.required or col.primary_key]
 
         if not isinstance(columns, list):
             raise TypeError("columns must be a list of Column objects")
@@ -29,35 +31,22 @@ class Table:
         data_dict: Dict[str,Any] ={}
 
         if isinstance(row, list):
-            # Check if all required columns were supplied or not
-            if len(row) != len(self.columns):
-                raise ValueError("Row length does not match number of columns.")
-            
+
+            # Check if all values are proivded or not
+            if len(self.columns) != len(row):
+                raise MissingColumnsInRowInsert()
             # Map list values to column names by position
             for i,col in enumerate(self.columns):
                 data_dict[col.column_name] = row[i]
         
         elif isinstance(row, dict):
             data_dict = row
-
-            # Check if any reuired column is missing, if so check if a default value can be substituted.
-            for col in self.columns:
-                if col.required and col.column_name not in data_dict:
-                    if col.default_value is not None:
-                        data_dict[col.column_name] = col.default_value
-                    else:
-                        raise ValueError(f"Missing required column: '{col.column_name}'.")
-            
-            # Check for unknown columns
-            extra_keys = set(data_dict.keys()) - {col.column_name for col in self.columns}
-            if extra_keys:
-                raise ValueError(f"Unknown columns in row: {extra_keys}")
         
         else:
             raise TypeError("Row must be a list or a dictionary.")
 
         # 2. Validate the row data provided with the columns definition
-        self.validate_row(data_dict)
+        self._validate_row(data_dict)
 
         # 3. Append row to rows of the table
         self.rows.append(Row(data_dict))
@@ -69,8 +58,28 @@ class Table:
                      if row not in rows_to_delete]
 
     """Validate the row data against the column definitions."""
-    def validate_row(self, data_dict:Dict):
+    def _validate_row(self, data_dict:Dict):
+
+        self._required_columns_check(data_dict)
+
+        # Check for unknown columns
+        extra_keys = set(data_dict.keys()) - {col.column_name for col in self.columns}
+        if extra_keys:
+            raise UnkownColumnInsert(extra_keys)
+            
+    '''Check if any reuired column is missing, if so check if a default value can be substituted.'''
+    def _required_columns_check(self, data_dict):
+
         for col in self.columns:
+            if col.required and col.column_name not in data_dict:
+                if col.default_value is not None:
+                    data_dict[col.column_name] = col.default_value
+                else:
+                    raise RequiredColumnMissing(col.column_name)
+
+            if col.primary_key:
+                self._primary_key_check()
+
             value = data_dict.get(col.column_name)
 
             # Skip validation if value is None and column is not required
@@ -79,6 +88,9 @@ class Table:
 
             # Use column's validate method
             col.validate_value(value)
+
+    def _primary_key_check(self):
+        pass
 
     """Get a string representation of the table, including its name, columns, and rows."""
     def __repr__(self):

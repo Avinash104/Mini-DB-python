@@ -79,7 +79,7 @@ class Database:
 
         return QueryBuilder(self,table_name,column_list)       
      
-    """Select rows from a table based on conditions."""
+    """Update the selected rows based on conditions."""
     def update(self, table_name: str):
         if table_name not in self.tables:
             raise TableDoesNotExistError(table_name)

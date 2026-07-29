@@ -6,7 +6,7 @@ employee_data.py
 
 EMPLOYEES = [
     [1, "Alice Johnson", 1, None, 1000.00, 42, 18, "Delhi", 101],
-    [2, "Bob Smith", 2, 1, 2000.00, 27, 4, "Mumbai", 102],
+    [2, "Bob Smith",2, 1, 2000.00, 27, 4, "Mumbai", 101],
     [3, "Charlie Brown", 1, 1, 3000.00, 33, 9, "Delhi", 101],
     [4, "David Wilson", 4, 1, 8000.00, 25, 2, "Hyderabad", 104],
     [5, "Eva Thomas", 5, 1, 8000.00, 31, 7, "Chennai", 105],
@@ -63,14 +63,14 @@ def load_test_data(db):
         "employees",
         [
             Column("emp_id", int, primary_key=True),
-            Column("name", str),
-            Column("department_id", int),
+            Column("name", str, required=True),
+            Column("department_id", int, required=True, default_value=0),
             Column("manager_id", int),
-            Column("salary", float),
-            Column("age", int),
+            Column("salary", float, required=True),
+            Column("age", int, required=True),
             Column("experience", int),
             Column("city", str),
-            Column("project_id", int),
+            Column("project_id", int, required=True, default_value=0),
         ],
     )
 
