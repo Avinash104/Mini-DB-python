@@ -1,6 +1,6 @@
 from typing import Any
 
-from exceptions import ColumnNotNullableError, ColumnTypeMismatchError
+from .exceptions import ColumnNotNullableError, ColumnTypeMismatchError
 
 """Column class for defining the structure of a table column."""
 class Column:

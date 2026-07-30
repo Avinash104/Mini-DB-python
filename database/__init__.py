@@ -4,7 +4,7 @@ from .column import Column
 from .row import Row
 
 # minidb/__init__.py
-from exceptions import (
+from .exceptions import (
     MiniDBError,
     DatabaseError,
     TableError,
@@ -15,5 +15,20 @@ from exceptions import (
     UnknownColumnError,
     RowError,
     RowValidationError,
-    DuplicatePrimaryKeyError
+    DuplicatePrimaryKeyError,
+    RequiredColumnMissing, 
+    NoQualifiedRowsForDelete, 
+    UpdateColumnTypeMismatch, 
+    RequiredColumnCannotBeNone, 
+    TableDoesNotExistError, 
+    InvalidDataTypeInWhereClause,
+    QueryInvalidOperatorError,
+    QueryInvalidAggregationError,
+    TableNameError,
+    TableCreationColumnError,
+    UnkownColumnInsert,
+    MissingColumnsInRowInsert,
+    ColumnNotNullableError,
+    ColumnTypeMismatchError,
+    UnknownGroupbyColumn
 )

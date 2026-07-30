@@ -1,13 +1,14 @@
 # from .database import Database
 from typing import Any
 import operator
-from exceptions import (QueryInvalidOperatorError, 
+from .exceptions import (QueryInvalidOperatorError, 
                         NoQualifiedRowsForDelete, 
                         RequiredColumnCannotBeNone, 
                         UpdateColumnTypeMismatch,
                         UnknownColumnError, 
                         QueryInvalidAggregationError, 
-                        InvalidDataTypeInWhereClause)
+                        InvalidDataTypeInWhereClause,
+                        UnknownGroupbyColumn)
 from enum import Enum
 
 class AggregationType(Enum):
@@ -100,6 +101,10 @@ class QueryBuilder:
     """Set the group_column property."""
     def group_by(self, column: str):
         # print("---group by---")
+
+        if not self.table.get_column(column):
+            raise UnknownGroupbyColumn(column)
+        
         self.group_column = column
         return self
 
@@ -398,15 +403,19 @@ class QueryBuilder:
 
             if groups is None:
                 return result
+
+            col_name = f"sum_{self.aggregation_column}"
             
             for key, group in groups.items():
                 sum_val = 0
                 for row in group:
                     sum_val += row[self.aggregation_column]
 
+                
+
                 dict_entry = {
                     self.group_column: key,
-                    "sum": sum_val
+                    col_name: sum_val
                 }
 
                 result.append(dict_entry)
@@ -443,6 +452,8 @@ class QueryBuilder:
             if groups is None:
                 return result
 
+            col_name = f"avg_{self.aggregation_column}"
+
             for key, group in groups.items():
                 sum_val = 0
                 count = 0
@@ -454,7 +465,7 @@ class QueryBuilder:
 
                 dict_entry = {
                     self.group_column: key,
-                    "avg": avg_val
+                    col_name: avg_val
                 }
                 
                 result.append(dict_entry)
@@ -487,6 +498,8 @@ class QueryBuilder:
             if groups is None:
                 return result
 
+            col_name = f"max_{self.aggregation_column}"
+
             for key, group in groups.items():
                 max_val = group[0][self.aggregation_column]
                 for row in group:
@@ -495,7 +508,7 @@ class QueryBuilder:
                     
                 dict_entry = {
                     self.group_column: key,
-                    "max": max_val
+                    col_name: max_val
                 }
                 
                 result.append(dict_entry)
@@ -528,6 +541,8 @@ class QueryBuilder:
         else:
             if groups is None:
                 return result
+
+            col_name = f"min_{self.aggregation_column}"
             
             for key, group in groups.items():
                 min_val = group[0][self.aggregation_column]
@@ -537,7 +552,7 @@ class QueryBuilder:
 
                 dict_entry = {
                     self.group_column: key,
-                    "min": min_val
+                    col_name: min_val
                 }
                 
                 result.append(dict_entry)

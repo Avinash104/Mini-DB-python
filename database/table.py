@@ -1,7 +1,7 @@
 from .column import Column
 from typing import Union, Dict, List, Any 
 from .row import Row
-from exceptions import RequiredColumnMissing, UnkownColumnInsert, MissingColumnsInRowInsert, DuplicatePrimaryKeyError
+from .exceptions import RequiredColumnMissing, UnkownColumnInsert, MissingColumnsInRowInsert, DuplicatePrimaryKeyError
 
 RowData = Union[Dict[str, Any], List[Any]]
 

@@ -1,7 +1,7 @@
 from .table import Table
 from .column import Column
 from .querybuilder import QueryBuilder
-from exceptions import (TableAlreadyExistsError, 
+from .exceptions import (TableAlreadyExistsError, 
                         TableNotFoundError, 
                         TableNameError, 
                         TableDoesNotExistError, 
