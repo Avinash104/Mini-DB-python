@@ -30,5 +30,7 @@ from .exceptions import (
     MissingColumnsInRowInsert,
     ColumnNotNullableError,
     ColumnTypeMismatchError,
-    UnknownGroupbyColumn
+    UnknownGroupbyColumn,
+    UnkownQueryBuilderMethod,
+    InvalidLimitValueInQuery
 )

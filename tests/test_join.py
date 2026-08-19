@@ -1,5 +1,4 @@
 import pytest
-from .conftest import test_db
 
 def test_inner_join(test_db):
     result = test_db.select(table_name="employees").inner_join("departments", "department_id", "id").execute()

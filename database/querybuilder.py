@@ -7,7 +7,7 @@ from .exceptions import (QueryInvalidOperatorError,
                         UpdateColumnTypeMismatch,
                         UnknownColumnError, 
                         QueryInvalidAggregationError, 
-                        InvalidDataTypeInWhereClause,
+                        InvalidDataTypeInWhereClause, UnkownQueryBuilderMethod, InvalidLimitValueInQuery,
                         UnknownGroupbyColumn)
 from enum import Enum
 
@@ -94,6 +94,9 @@ class QueryBuilder:
 
     """Set the limit_count property."""
     def limit(self, limit: int):
+
+        if limit < 1:
+            raise InvalidLimitValueInQuery(limit)
         
         self.limit_count = limit
         return self
@@ -558,3 +561,7 @@ class QueryBuilder:
                 result.append(dict_entry)
 
             return result
+
+    '''Catch any unkown method invoked in the query.'''
+    def __getattr__(self, method_name):
+        raise UnkownQueryBuilderMethod(method_name)

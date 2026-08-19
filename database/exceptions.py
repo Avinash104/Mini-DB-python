@@ -208,3 +208,22 @@ class UnknownGroupbyColumn(QueryError):
         message = f"Unkown column '{unkown_column}' provided in group by operation."
 
         super().__init__(message)
+
+class UnkownQueryBuilderMethod(QueryError):
+    """Raised when unkown method is invoked on Query Builder class."""
+    def __init__(self, unkown_method: str):
+        self.unkown_method = unkown_method
+
+        message = f"Unkown method '{unkown_method}' invoked in the query."
+
+        super().__init__(message)
+
+class InvalidLimitValueInQuery(QueryError):
+    """Raised when unkown method is invoked on Query Builder class."""
+    def __init__(self, limit_value: int):
+        self.limit_value = limit_value
+
+        message = f"Invalid limit value '{limit_value}' invoked in the query."
+
+        super().__init__(message)
+

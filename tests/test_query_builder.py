@@ -1,5 +1,5 @@
 import pytest
-from database import UnknownColumnError, UnknownGroupbyColumn, QueryInvalidAggregationError
+from database import UnknownColumnError, UnknownGroupbyColumn, QueryInvalidAggregationError, UnkownQueryBuilderMethod, InvalidLimitValueInQuery
 
 """Test cases for the query builder functionality of the Database class."""
 
@@ -141,16 +141,16 @@ def test_group_by_with_unknown_column(test_db):
         test_db.select(table_name="employees").group_by("unknown_column").count().execute()
 
 def test_group_by_with_unknown_aggregation(test_db):
-    with pytest.raises(QueryInvalidAggregationError):
+    with pytest.raises(UnkownQueryBuilderMethod):
         test_db.select(table_name="employees").group_by("department_id").unknown_aggregation("salary").execute()
 
-# def test_group_by_with_invalid_ordering_column(test_db):
-#     with pytest.raises(ValueError):
-#         test_db.select(table_name="employees").group_by("department_id").count().order_by("unknown_column").execute()
+def test_group_by_with_invalid_ordering_column(test_db):
+    with pytest.raises(UnknownColumnError):
+        test_db.select(table_name="employees").group_by("department_id").count().order_by("unknown_column").execute()
 
-# def test_group_by_with_invalid_limit_value(test_db):
-#     with pytest.raises(ValueError):
-#         test_db.select(table_name="employees").group_by("department_id").count().limit(-1).execute()
+def test_group_by_with_invalid_limit_value(test_db):
+    with pytest.raises(InvalidLimitValueInQuery):
+        test_db.select(table_name="employees").group_by("department_id").count().limit(-1).execute()
 
 # def test_group_by_with_no_aggregations(test_db):
 #     with pytest.raises(ValueError):
